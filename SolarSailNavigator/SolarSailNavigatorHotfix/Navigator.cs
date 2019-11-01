@@ -103,7 +103,7 @@ namespace SolarSailNavigator {
 		foreach (Part p in vessel.parts) {
 		    foreach (PartModule pm in p.Modules) {
 			if (pm is ModuleSolarSail) {
-			    solarSails.Add((SolarSailPart)pm);
+			    solarSails.Add((ModuleSolarSail)pm);
 			} else if (pm is ModuleEnginesWarp) {
 			    var pm2 = (ModuleEnginesWarp)pm;
 			    if (pm2.IsPersistentEngine) {
