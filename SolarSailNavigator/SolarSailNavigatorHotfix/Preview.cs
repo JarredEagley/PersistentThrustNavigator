@@ -5,6 +5,8 @@ using System.Linq;
 using UnityEngine;
 //using PersistentThrust;
 using FNPlugin; // It seems the KSPIE equivalent is a part of FNPlugin and is instead called 'ModuleEnginesWarp.cs'
+using FNPlugin.Extensions;
+using FNPlugin.Constants;
 
 namespace SolarSailNavigator {
 
@@ -38,7 +40,7 @@ namespace SolarSailNavigator {
 	    
 	    // Working orbit at each time step
 	    Orbit orbit = orbit0.Clone();
-
+            
 	    // Number of time steps
 	    int nsteps = Convert.ToInt32(Math.Ceiling((UTf - UT0) / dT));
 
@@ -134,8 +136,8 @@ namespace SolarSailNavigator {
 		// Update 
 
 		// Update orbit
-		orbit.Perturb(deltaVV, UT);
-
+		orbit.Perturb(deltaVV, UT); 
+               
 		// Increment time step at which to sample orbits
 		dTchoose += dT;
 
