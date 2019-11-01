@@ -59,10 +59,10 @@ namespace SolarSailNavigator {
 	public Controls controls;
 
 	// Engine part modules this controls
-	public List<PersistentEngine> persistentEngines;
+	public List<ModuleEnginesWarp> persistentEngines;
 
 	// Solar sail part modules this controls
-	public List<SolarSailPart> solarSails;
+	public List<ModuleSolarSail> solarSails;
 
 	// Show controls
 	[KSPEvent(guiActive = true, guiName = "Show Navigator Controls", active = true)]
@@ -102,12 +102,12 @@ namespace SolarSailNavigator {
 		// Find sails and persistent engines
 		foreach (Part p in vessel.parts) {
 		    foreach (PartModule pm in p.Modules) {
-			if (pm is SolarSailPart) {
+			if (pm is ModuleSolarSail) {
 			    solarSails.Add((SolarSailPart)pm);
-			} else if (pm is PersistentEngine) {
-			    var pm2 = (PersistentEngine)pm;
+			} else if (pm is ModuleEnginesWarp) {
+			    var pm2 = (ModuleEnginesWarp)pm;
 			    if (pm2.IsPersistentEngine) {
-				persistentEngines.Add((PersistentEngine)pm);
+				persistentEngines.Add((ModuleEnginesWarp)pm);
 			    }
 			}
 		    }
