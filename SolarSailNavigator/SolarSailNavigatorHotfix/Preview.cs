@@ -112,7 +112,7 @@ namespace SolarSailNavigator {
 			
 			// Check if sail in sun
 			double sunlightFactor = 1.0;
-			if (!SolarSailPart.inSun(orbit, UT)) {
+			if (!ModuleSolarSail.inSun(orbit, UT)) {
 			    sunlightFactor = 0.0;
 			}
 			
@@ -120,7 +120,7 @@ namespace SolarSailNavigator {
 			Vector3d n = sailFrame * new Vector3d(0.0, 1.0, 0.0);
 			
 			// Force on sail
-			Vector3d solarForce = SolarSailPart.CalculateSolarForce(s, orbit, n, UT) * sunlightFactor;
+			Vector3d solarForce = ModuleSolarSail.CalculateSolarForce(s, orbit, n, UT) * sunlightFactor;
 			
 			// Sail acceleration
 			Vector3d solarAccel = solarForce / m0i / 1000.0;
