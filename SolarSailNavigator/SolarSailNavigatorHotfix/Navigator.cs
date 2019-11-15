@@ -169,10 +169,22 @@ namespace SolarSailNavigator {
 			            }
 			            // Warp mode
 			            else {
-			                foreach (var pe in persistentEngines) {
-                            pe.ThrottlePersistent = control.throttle; 
-				            pe.ThrustPersistent = control.throttle * pe.engine.maxThrust;
-				            pe.IspPersistent = pe.engine.atmosphereCurve.Evaluate(0); 
+                            // Get the needed attributes via reflection. 
+                            var ThrottlePersistant = typeof(ModuleEnginesWarp).GetField("_throttlePersistent", BindingFlags.NonPublic | BindingFlags.Instance);
+                            var ThrustPersistant = typeof(ModuleEnginesWarp).GetField("_thrustPersistent", BindingFlags.NonPublic | BindingFlags.Instance);
+                            var IspPersistant = typeof(ModuleEnginesWarp).GetField("_throttlePersistent", BindingFlags.NonPublic | BindingFlags.Instance);
+                            // public float maxThrust; inherited from ModuleEngines
+                            var MaxThrust = typeof(ModuleEngines).GetField("maxThrust", BindingFlags.NonPublic | BindingFlags.Instance);
+                            foreach (var pe in persistentEngines) {
+                                // Original code:
+                                //pe.ThrottlePersistent = control.throttle; 
+                                //pe.ThrustPersistent = control.throttle * pe.engine.maxThrust;
+                                //pe.IspPersistent = pe.engine.atmosphereCurve.Evaluate(0); 
+                                ThrottlePersistant.SetValue(pe, control.throttle);
+                                var _maxthrust = (float)MaxThrust.GetValue(pe);
+                                ThrustPersistant.SetValue(pe, control.throttle * _maxthrust);
+                                IspPersistant.SetValue(pe, pe.atmosphereCurve.Evaluate(0));
+
 			                }
 			            }
 		            }
