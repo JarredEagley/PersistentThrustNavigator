@@ -153,47 +153,47 @@ namespace SolarSailNavigator {
 	    public void FixedUpdate() {
 	        if (anyPersistent) {
 		
-		    // Universal time
-		    double UT = Planetarium.GetUniversalTime();
+		        // Universal time
+		        double UT = Planetarium.GetUniversalTime();
 		
-		    // Force attitude to specified frame & hold throttle
-		    if (FlightGlobals.fetch != null && IsLocked) {
-		        // Set attitude
-		        Control control = controls.Lookup(UT);
-		        vessel.SetRotation(control.frame.qfn(vessel.orbit, UT, control.angles));
-		        // Set throttle
-		        if (isEnabled) {
-			    // Realtime mode
-			    if (!vessel.packed) {
-			        vessel.ctrlState.mainThrottle = control.throttle;
-			    }
-			    // Warp mode
-			    else {
-			        foreach (var pe in persistentEngines) {
-                    pe.ThrottlePersistent = control.throttle; 
-				    pe.ThrustPersistent = control.throttle * pe.engine.maxThrust;
-				    pe.IspPersistent = pe.engine.atmosphereCurve.Evaluate(0); 
-			        }
-			    }
+		        // Force attitude to specified frame & hold throttle
+		        if (FlightGlobals.fetch != null && IsLocked) {
+		            // Set attitude
+		            Control control = controls.Lookup(UT);
+		            vessel.SetRotation(control.frame.qfn(vessel.orbit, UT, control.angles));
+		            // Set throttle
+		            if (isEnabled) {
+			            // Realtime mode
+			            if (!vessel.packed) {
+			                vessel.ctrlState.mainThrottle = control.throttle;
+			            }
+			            // Warp mode
+			            else {
+			                foreach (var pe in persistentEngines) {
+                            pe.ThrottlePersistent = control.throttle; 
+				            pe.ThrustPersistent = control.throttle * pe.engine.maxThrust;
+				            pe.IspPersistent = pe.engine.atmosphereCurve.Evaluate(0); 
+			                }
+			            }
+		            }
+		            // Are sails in use?
+		            foreach (var s in solarSails) {
+			            // Control's "sailon" changes relative to sail's "IsEnabled"
+			            if (control.sailon != s.IsEnabled) {
+			                if (control.sailon) { // Sail on
+				            s.DeploySail();
+			                }
+			                else { // Sail not on
+				            s.RetractSail();
+			                }
+			            }
+		            }
 		        }
-		        // Are sails in use?
-		        foreach (var s in solarSails) {
-			    // Control's "sailon" changes relative to sail's "IsEnabled"
-			    if (control.sailon != s.IsEnabled) {
-			        if (control.sailon) { // Sail on
-				    s.DeploySail();
-			        }
-			        else { // Sail not on
-				    s.RetractSail();
-			        }
-			    }
-		        }
-		    }
 	        }
 
 	        // Update preview trajectory if it exists
 	        if (anyPersistent) {
-		    controls.preview.Update(vessel);
+		        controls.preview.Update(vessel);
 	        }
 	    }
     }
