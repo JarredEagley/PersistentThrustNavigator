@@ -157,8 +157,26 @@ namespace SolarSailNavigator {
 	    // Update final mass
 	    m1 = m0i;
 	}
-	
-	public PreviewSegment(Navigator navigator, Orbit orbitInitial, double UT0, double UTf, Control control, Color color, double m0in) {
+
+    // Calculate DeltaV vector and update resource demand from mass (demandMass) Copied from the original PersistentEngine.cs
+    // Needs modified to work from here.
+    public virtual Vector3d CalculateDeltaVV(double m0, double dT, float thrust, float isp, Vector3d thrustUV, out double demandMass)
+    {
+        // Mass flow rate
+        var mdot = thrust / (isp * 9.81f);
+        // Change in mass over time interval dT
+        var dm = mdot * dT;
+        // Resource demand from propellants with mass
+        demandMass = dm / densityAverage;
+        // Mass at end of time interval dT
+        var m1 = m0 - dm;
+        // deltaV amount
+        var deltaV = isp * 9.81f * Math.Log(m0 / m1);
+        // Return deltaV vector
+        return deltaV * thrustUV;
+    }
+
+        public PreviewSegment(Navigator navigator, Orbit orbitInitial, double UT0, double UTf, Control control, Color color, double m0in) {
 	    this.UT0 = UT0;
 	    this.UTf = UTf;
 	    dT = TimeWarp.fixedDeltaTime * control.warp;
