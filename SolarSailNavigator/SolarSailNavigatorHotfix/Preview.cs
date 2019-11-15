@@ -89,26 +89,29 @@ namespace SolarSailNavigator {
 		        // Only count thrust of engines that are not shut down in preview
 		        if (pe.getIgnitionState) {
 
-                    // Thrust unit vector
-                    Vector3d thrustUV = sailFrame * new Vector3d(0.0, 1.0, 0.0);
+                        // Thrust unit vector
+                        Vector3d thrustUV = sailFrame * new Vector3d(0.0, 1.0, 0.0);
 			
-                    // Isp: Currently vacuum. TODO: calculate at current air pressure
-                    float isp = pe.atmosphereCurve.Evaluate(0);
+                        // Isp: Currently vacuum. TODO: calculate at current air pressure
+                        float isp = pe.atmosphereCurve.Evaluate(0);
 			
-                    // Thrust vector
-                    float thrust = throttle * pe.maxThrust;
+                        // Thrust vector
+                        float thrust = throttle * pe.maxThrust;
 
-                    // Calculate deltaV vector
-                    double demandMass;
-                    //        private double averageDensityInTonPerLiter; is a field in ModuleEnginesWarp
-                    double densityAverage = (double)( typeof(ModuleEnginesWarp).GetField("averageDensityInTonPerLiter", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(pe) );
+                        // Calculate deltaV vector
+                        double demandMass;
+                        //        private double averageDensityInTonPerLiter; is a field in ModuleEnginesWarp
+                        double densityAverage = (double)( typeof(ModuleEnginesWarp).GetField("averageDensityInTonPerLiter", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(pe) );
 
-                    deltaVV += pe.CalculateDeltaVV(m0i, dT, thrust, isp, thrustUV, out demandMass);
+                        //deltaVV += pe.CalculateDeltaVV(m0i, dT, thrust, isp, thrustUV, out demandMass);
+                        deltaVV += CalculateDeltaVV(m0i, dT, thrust, isp, thrustUV, out demandMass, densityAverage); // I made this into a private method in this class.
 
-                    // Update mass usage
-			        dms += demandMass * pe.densityAverage;
+                        // Update mass usage
+			            dms += demandMass * densityAverage;
 		        }
+
 		    }
+
 		
 		    // Iterate over sails
 		    if (sailon) {
@@ -163,8 +166,8 @@ namespace SolarSailNavigator {
 	}
 
     // Calculate DeltaV vector and update resource demand from mass (demandMass) Copied from the original PersistentEngine.cs
-    // Needs modified to work from here.
-    public virtual Vector3d CalculateDeltaVV(double m0, double dT, float thrust, float isp, Vector3d thrustUV, out double demandMass)
+    // Needs modified to work from here. Now takes densityAverage as a parameter.
+    public virtual Vector3d CalculateDeltaVV(double m0, double dT, float thrust, float isp, Vector3d thrustUV, out double demandMass, double densityAverage)
     {
         // Mass flow rate
         var mdot = thrust / (isp * 9.81f);
