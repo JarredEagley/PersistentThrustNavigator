@@ -82,11 +82,11 @@ namespace SolarSailNavigator {
 	    // When to draw Controls GUI
 	    private void OnGUI() {
 	        if (IsControlled & anyPersistent) {
-		    controls.DrawControls();
-		    controls.defaultWindow.DrawWindow();
-		    foreach (var control in controls.controls) {
-		        control.frameWindow.DrawFrameWindow();
-		    }
+		        controls.DrawControls();
+		        controls.defaultWindow.DrawWindow();
+		        foreach (var control in controls.controls) {
+		            control.frameWindow.DrawFrameWindow();
+		        }
 	        }
 	    }
 	
