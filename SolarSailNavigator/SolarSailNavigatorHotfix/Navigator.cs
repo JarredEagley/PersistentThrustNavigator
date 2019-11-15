@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 //using PersistentThrust;
 using FNPlugin; // It seems the KSPIE equivalent is a part of FNPlugin and is instead called 'ModuleEnginesWarp.cs'
+using System.Reflection;
 
 namespace SolarSailNavigator {
 
@@ -91,40 +92,47 @@ namespace SolarSailNavigator {
 	// Initialization
 	public override void OnStart(StartState state) {
 
-	    // Check: are we starting?
-	    Debug.Log("[SolarSailNavigator] " + this.part.partName + " OnStart(). IsLocked: " + this.IsLocked);
+	        // Check: are we starting?
+	        Debug.Log("[SolarSailNavigator] " + this.part.partName + " OnStart(). IsLocked: " + this.IsLocked);
 	    
-	    // Base initialization
-	    base.OnStart(state);
+	        // Base initialization
+	        base.OnStart(state);
 	    
-	    if (state != StartState.None && state != StartState.Editor) {
+	        if (state != StartState.None && state != StartState.Editor) {
 
-		// Find sails and persistent engines
-		foreach (Part p in vessel.parts) {
-		    foreach (PartModule pm in p.Modules) {
-			if (pm is ModuleSolarSail) {
-			    solarSails.Add((ModuleSolarSail)pm);
-			} else if (pm is ModuleEnginesWarp) {
-			    var pm2 = (ModuleEnginesWarp)pm;
-			    if (pm2.IsPersistentEngine) {
-				persistentEngines.Add((ModuleEnginesWarp)pm);
-			    }
-			}
-		    }
-		}
+		        // Find sails and persistent engines
+		        foreach (Part p in vessel.parts) {
+		            foreach (PartModule pm in p.Modules) {
+			            if (pm is ModuleSolarSail) {
+			                solarSails.Add((ModuleSolarSail)pm);
+			            } else if (pm is ModuleEnginesWarp) {
+                            var pm2 = (ModuleEnginesWarp)pm;
+                            // Get the ModuleEngineWarp 'isPersistant' field via reflection.
+                            var pm2_persistance = typeof(ModuleEnginesWarp).GetField("isPersistant", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(pm2);
+                            //if (pm2.IsPersistentEngine) {
+                            if (fi_persistance.GetCustomAttribute(typeof(isPersistant)) != null) { 
+                            persistentEngines.Add((ModuleEnginesWarp)pm);
+			                }
+
+			            }
+
+		            }
+
+		        }
+
 				
-		if (solarSails.Count > 0 || persistentEngines.Count > 0) {
-		    // Persistent propulsion found
-		    anyPersistent = true;
+		        if (solarSails.Count > 0 || persistentEngines.Count > 0) {
+		            // Persistent propulsion found
+		            anyPersistent = true;
 		    
-		    // Sail controls
-		    controls = new Controls(this);
-		} else {
-		    anyPersistent = false;
-		    Events["ShowControls"].active = false;
-		    Events["HideControls"].active = false;
-		}
-	    }
+		            // Sail controls
+		            controls = new Controls(this);
+		        } else {
+		            anyPersistent = false;
+		            Events["ShowControls"].active = false;
+		            Events["HideControls"].active = false;
+		        }
+	        }
 	}
 
 	// Updated
@@ -161,9 +169,9 @@ namespace SolarSailNavigator {
 			// Warp mode
 			else {
 			    foreach (var pe in persistentEngines) {
-				pe.ThrottlePersistent = control.throttle;
+                pe.ThrottlePersistent = control.throttle; 
 				pe.ThrustPersistent = control.throttle * pe.engine.maxThrust;
-				pe.IspPersistent = pe.engine.atmosphereCurve.Evaluate(0);
+				pe.IspPersistent = pe.engine.atmosphereCurve.Evaluate(0); 
 			    }
 			}
 		    }
