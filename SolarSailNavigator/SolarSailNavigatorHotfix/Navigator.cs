@@ -63,7 +63,8 @@ namespace SolarSailNavigator {
 	    public List<ModuleEnginesWarp> persistentEngines;
 
 	    // Solar sail part modules this controls
-	    public List<ModuleSolarSail> solarSails;
+	    //public List<ModuleSolarSail> solarSails;
+	    private List<ModuleSolarSail> solarSails;
 
 	    // Show controls
 	    [KSPEvent(guiActive = true, guiName = "Show Navigator Controls", active = true)]
