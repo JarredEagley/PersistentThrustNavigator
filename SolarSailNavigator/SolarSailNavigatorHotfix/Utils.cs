@@ -73,13 +73,13 @@ namespace SolarSailNavigator {
 		int controlID = GUIUtility.GetControlID(popupListHash, FocusType.Passive);
 		bool done = false;
 		switch (Event.current.GetTypeForControl(controlID)) {
-		    case EventType.mouseDown:
+		    case EventType.MouseDown:
 			if (position.Contains(Event.current.mousePosition)) {
 			    GUIUtility.hotControl = controlID;
 			    showList = true;
 			}
 			break;
-		    case EventType.mouseUp:
+		    case EventType.MouseUp:
 			if (showList) {
 			    done = true;
 			}
