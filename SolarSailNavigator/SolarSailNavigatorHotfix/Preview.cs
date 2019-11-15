@@ -7,6 +7,7 @@ using UnityEngine;
 using FNPlugin; // It seems the KSPIE equivalent is a part of FNPlugin and is instead called 'ModuleEnginesWarp.cs'
 using FNPlugin.Extensions;
 using FNPlugin.Constants;
+using System.Reflection;
 
 namespace SolarSailNavigator {
 
@@ -88,21 +89,24 @@ namespace SolarSailNavigator {
 		        // Only count thrust of engines that are not shut down in preview
 		        if (pe.getIgnitionState) {
 
-			    // Thrust unit vector
-			    Vector3d thrustUV = sailFrame * new Vector3d(0.0, 1.0, 0.0);
+                    // Thrust unit vector
+                    Vector3d thrustUV = sailFrame * new Vector3d(0.0, 1.0, 0.0);
 			
-			    // Isp: Currently vacuum. TODO: calculate at current air pressure
-			    float isp = pe.atmosphereCurve.Evaluate(0);
+                    // Isp: Currently vacuum. TODO: calculate at current air pressure
+                    float isp = pe.atmosphereCurve.Evaluate(0);
 			
-			    // Thrust vector
-			    float thrust = throttle * pe.maxThrust;
+                    // Thrust vector
+                    float thrust = throttle * pe.maxThrust;
 
-			    // Calculate deltaV vector
-			    double demandMass;
-			    deltaVV += pe.CalculateDeltaVV(m0i, dT, thrust, isp, thrustUV, out demandMass);
+                    // Calculate deltaV vector
+                    double demandMass;
+                    //        private double averageDensityInTonPerLiter; is a field in ModuleEnginesWarp
+                    double densityAverage = (double)( typeof(ModuleEnginesWarp).GetField("averageDensityInTonPerLiter", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(pe) );
 
-			    // Update mass usage
-			    dms += demandMass * pe.densityAverage;
+                    deltaVV += pe.CalculateDeltaVV(m0i, dT, thrust, isp, thrustUV, out demandMass);
+
+                    // Update mass usage
+			        dms += demandMass * pe.densityAverage;
 		        }
 		    }
 		
