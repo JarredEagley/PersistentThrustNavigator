@@ -5,10 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="KSPIE\FNPlugin\WarpPlugin.csproj" />
-    <None Include="KSPIE\FNPlugin\WarpPlugin.csproj.user" />
-    <None Include="KSPIE\PhotonSail\PhotonSail.csproj" />
-    <None Include="KSPIE\Redist\Interstellar_Redist.csproj" />
+    <Compile Remove="KSPIE\**" />
+    <EmbeddedResource Remove="KSPIE\**" />
+    <None Remove="KSPIE\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,6 +35,12 @@
     <Reference Include="I18N.West">
       <HintPath>..\..\..\..\KSP_x64_Data\Managed\I18N.West.dll</HintPath>
     </Reference>
+    <Reference Include="Interstellar">
+      <HintPath>..\..\..\..\GameData\WarpPlugin\Plugins\Interstellar.dll</HintPath>
+    </Reference>
+    <Reference Include="Interstellar_Redist">
+      <HintPath>..\..\..\..\GameData\WarpPlugin\Plugins\Interstellar_Redist.dll</HintPath>
+    </Reference>
     <Reference Include="Ionic.Zip">
       <HintPath>..\..\..\..\KSP_x64_Data\Managed\Ionic.Zip.dll</HintPath>
     </Reference>
@@ -47,6 +52,9 @@
     </Reference>
     <Reference Include="KSPTrackIR">
       <HintPath>..\..\..\..\KSP_x64_Data\Managed\KSPTrackIR.dll</HintPath>
+    </Reference>
+    <Reference Include="MiniAVC">
+      <HintPath>..\..\..\..\GameData\WarpPlugin\Plugins\MiniAVC.dll</HintPath>
     </Reference>
     <Reference Include="ModuleManager">
       <HintPath>..\..\..\..\GameData\ModuleManager.4.1.0.dll</HintPath>

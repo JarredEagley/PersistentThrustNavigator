@@ -86,16 +86,16 @@ namespace SolarSailNavigator {
 		foreach (var pe in navigator.persistentEngines) {
 
 		    // Only count thrust of engines that are not shut down in preview
-		    if (pe.engine.getIgnitionState) {
+		    if (pe.getIgnitionState) {
 
 			// Thrust unit vector
 			Vector3d thrustUV = sailFrame * new Vector3d(0.0, 1.0, 0.0);
 			
 			// Isp: Currently vacuum. TODO: calculate at current air pressure
-			float isp = pe.engine.atmosphereCurve.Evaluate(0);
+			float isp = pe.atmosphereCurve.Evaluate(0);
 			
 			// Thrust vector
-			float thrust = throttle * pe.engine.maxThrust;
+			float thrust = throttle * pe.maxThrust;
 
 			// Calculate deltaV vector
 			double demandMass;
