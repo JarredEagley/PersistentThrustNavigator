@@ -110,8 +110,8 @@ namespace SolarSailNavigator {
                             // Get the ModuleEngineWarp 'isPersistant' field via reflection.
                             var pm2_persistance = typeof(ModuleEnginesWarp).GetField("isPersistant", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(pm2);
                             //if (pm2.IsPersistentEngine) {
-                            if (fi_persistance.GetCustomAttribute(typeof(isPersistant)) != null) { 
-                            persistentEngines.Add((ModuleEnginesWarp)pm);
+                            if (pm2_persistance != null && pm2_persistance.Equals(true)) { 
+                                persistentEngines.Add((ModuleEnginesWarp)pm);
 			                }
 
 			            }
