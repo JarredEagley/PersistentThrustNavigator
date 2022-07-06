@@ -1,3 +1,11 @@
+
+* Forked to create persistent thrust navigator: https://forum.kerbalspaceprogram.com/index.php?/topic/194707-1711811911101-persistent-thrust-extended-175-now-with-background-persistent-thrust/
+** No version number yet.
+*** Added visual studio solution/project files.
+*** Updated references for compatibility with Freethinker's PersistentThrust.
+*** Removed references to solar sails; persistent thrust does not implement them unfortunately.
+*** Fixed hyperbolic trajectories breaking the trajectory due to orbital period shooting to infinity.
+
 * SolarSailNavigator Changelog
 ** v1.0.10
 *** Updated Makefile to compile on KSP 1.4.4
