@@ -366,14 +366,25 @@ namespace SolarSailNavigator {
 				orbitf = orbitInitial;
 				// Period of final orbit
 				double TPf = orbitf.period;
-				// Populate points
-				for(var i = 0; i <= 360; i++) {
-					double UTi = this.UTf + i * TPf / 360;
-					// Relative orbitf position
-					Vector3d rRelOrbitf = orbitf.getRelativePositionAtUT(UTi).xzy;
-					// Absolute position
-					linefPoints[i] = rRelOrbitf;
-				}
+				if (!double.IsInfinity(TPf))
+                {
+					// Populate points
+					for(var i = 0; i <= 360; i++) {
+						double UTi = this.UTf + i * TPf / 360;
+						// Relative orbitf position
+						Vector3d rRelOrbitf = orbitf.getRelativePositionAtUT(UTi).xzy;
+						// Absolute position
+						linefPoints[i] = rRelOrbitf;
+					}
+                }
+				else {
+					// Hyperbolic final orbit. Can't use TPf.
+					for (int i = 0; i <= 360; ++i) {
+						double UTi = this.UTf + i * 10000.0;
+						Vector3d rRelOrbitf = orbitf.getRelativePositionAtUT(UTi).xzy;
+						linefPoints[i] = rRelOrbitf;
+					}
+                }
 		
 				// Target line
 				CalculateTargetLine();
