@@ -119,11 +119,13 @@ namespace SolarSailNavigator {
 			GUILayout.EndHorizontal();
 
 			// Turn sail on/off for this segment
+			/*
 			if (GUILayout.Toggle(sailon, "Use Sails") != sailon) {
 				sailon = !sailon;
 				sailon_str = sailon.ToString();
 				controls.Update();
 			}
+			*/
 
 			GUILayout.EndVertical();
 		}

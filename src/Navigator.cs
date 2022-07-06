@@ -47,7 +47,7 @@ namespace SolarSailNavigator {
 		[KSPField(isPersistant = true)] // Throttle
 		public float defaultThrottle = 0f;
 		[KSPField(isPersistant = true)] // Is sail on?
-		public bool defaultSailon = true;
+		public bool defaultSailon = false;
 		[KSPField(isPersistant = true)] // Is sail on?
 		public int defaultIWarp = 10;
 
