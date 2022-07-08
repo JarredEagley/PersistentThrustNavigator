@@ -106,32 +106,10 @@ namespace SolarSailNavigator {
 						dms += demandMass * pe.currentEngine.averageDensity;
 					}
 				}
-		
+
+
 				// Iterate over sails
-				/*
-				if (sailon) {
-					foreach (var s in navigator.solarSails) {
-			
-						// Check if sail in sun
-						double sunlightFactor = 1.0;
-						if (!SolarSailPart.inSun(orbit, UT)) {
-							sunlightFactor = 0.0;
-						}
-			
-						// Normal vector
-						Vector3d n = sailFrame * new Vector3d(0.0, 1.0, 0.0);
-			
-						// Force on sail
-						Vector3d solarForce = SolarSailPart.CalculateSolarForce(s, orbit, n, UT) * sunlightFactor;
-			
-						// Sail acceleration
-						Vector3d solarAccel = solarForce / m0i / 1000.0;
-			
-						// Update deltaVV
-						deltaVV += solarAccel * dT;
-					}
-				}
-				*/
+				// < removed > 
 
 				// Update starting mass for next time step
 				m0i -= dms;
@@ -139,7 +117,18 @@ namespace SolarSailNavigator {
 				// Update 
 
 				// Update orbit
-				orbit.Perturb(deltaVV, UT);
+				if (deltaVV != Vector3d.zero)
+                {
+					orbit.Perturb(deltaVV, UT);
+                }
+                else
+                {
+					// orbit.Perturb(...) instantly returns if magnitude of deltaVV == 0. But we still need it to update the epoch for the orbital lines to display correctly!
+					// There's definately a more graceful way to do this.
+					orbit.UpdateFromStateVectors(orbit.getRelativePositionAtUT(UT), orbit.getOrbitalVelocityAtUT(UT), orbit.referenceBody, UT);
+					orbit.Init();
+					orbit.UpdateFromUT(UT);
+                }
 
 				// Increment time step at which to sample orbits
 				dTchoose += dT;
@@ -173,8 +162,12 @@ namespace SolarSailNavigator {
 		public PreviewSegment(Navigator navigator, Orbit orbitInitial, double UT0, double UTf, Control control, Color color, double m0in) {
 			this.UT0 = UT0;
 			this.UTf = UTf;
-			dT = TimeWarp.fixedDeltaTime * control.warp;
-	    
+			dT = double.IsInfinity(orbitInitial.referenceBody.sphereOfInfluence) ? 
+				TimeWarp.fixedDeltaTime * control.warp :											// Sun-like (infinite SOI)
+				TimeWarp.fixedDeltaTime * (orbitInitial.referenceBody.sphereOfInfluence/10000.0);	// Scale based on SOI
+			//dT = TimeWarp.fixedDeltaTime * control.warp ;
+			//Debug.LogError("dT = " + TimeWarp.fixedDeltaTime + " * " + control.warp + " = " + dT);
+
 			// Update preview orbits
 			this.Propagate(navigator, orbitInitial, UT0, UTf, dT, control, m0in);
 			orbit0 = orbits[0];
@@ -220,7 +213,7 @@ namespace SolarSailNavigator {
 				}
 			}
 		}
-		}
+	}
     
 	public class Preview {
 	
@@ -330,6 +323,7 @@ namespace SolarSailNavigator {
 				Orbit orbitInitial = navigator.vessel.orbit;
 				// Initial mass per segment
 				double m0i = navigator.vessel.GetTotalMass();
+				
 				// Calculate each segment
 				for (var i = 0; i < segments.Length; i++) {
 					// End time
