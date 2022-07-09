@@ -351,7 +351,9 @@ namespace SolarSailNavigator {
 				linef = objf.AddComponent<LineRenderer>();
 				linef.useWorldSpace = false;
 				objf.layer = 10; // Map
-				linef.material = MapView.fetch.orbitLinesMaterial;
+				//linef.material = MapView.fetch.orbitLinesMaterial;
+				linef.material = MapView.fetch.dottedLineMaterial;
+				linef.material.mainTextureScale = new Vector2(100, 1);
 				linef.SetColors(navigator.controls.colorFinal, navigator.controls.colorFinal);
 				linef.SetVertexCount(361);
 				// 3D points to use in linef
