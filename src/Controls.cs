@@ -283,7 +283,7 @@ namespace SolarSailNavigator {
 			// Angle strings
 			anglestr = new string [3];
 			for (int i = 0; i < 3; i++) {
-			anglestr[i] = angles[i].ToString();
+				anglestr[i] = angles[i].ToString();
 			}
 			// Throttle
 			throttle_str = throttle.ToString();
@@ -631,7 +631,7 @@ namespace SolarSailNavigator {
 		// Controls GUI function
 		public void DrawControls () {
 			if (navigator.vessel == FlightGlobals.ActiveVessel)
-			controlWindowPos = GUILayout.Window(id, controlWindowPos, ControlsGUI, "Controls");
+				controlWindowPos = GUILayout.Window(id, controlWindowPos, ControlsGUI, "Controls");
 		}
 	
 		// Add a control
@@ -645,10 +645,10 @@ namespace SolarSailNavigator {
 		// Remove a control
 		public void Remove (int i) {
 			if (ncontrols > 1) { // Don't remove last control
-			controls.RemoveAt(i);
-			ncontrols = controls.Count;
-			colorFinal = colorMap[ncontrols % colorMap.Length];
-			Update();
+				controls.RemoveAt(i);
+				ncontrols = controls.Count;
+				colorFinal = colorMap[ncontrols % colorMap.Length];
+				Update();
 			}
 		}
 	
@@ -679,13 +679,13 @@ namespace SolarSailNavigator {
 			navigator.sailons = controls[0].sailon.ToString();
 			navigator.durations = controls[0].duration.ToString();
 			for (var i = 1; i < ncontrols; i++) {
-			navigator.frames += delimiter + controls[i].frame.name;
-			navigator.angle0s += delimiter + controls[i].angles[0].ToString();
-			navigator.angle1s += delimiter + controls[i].angles[1].ToString();
-			navigator.angle2s += delimiter + controls[i].angles[2].ToString();
-			navigator.throttles += delimiter + controls[i].throttle.ToString();
-			navigator.sailons += delimiter + controls[i].sailon.ToString();
-			navigator.durations += delimiter + controls[i].duration.ToString();
+				navigator.frames += delimiter + controls[i].frame.name;
+				navigator.angle0s += delimiter + controls[i].angles[0].ToString();
+				navigator.angle1s += delimiter + controls[i].angles[1].ToString();
+				navigator.angle2s += delimiter + controls[i].angles[2].ToString();
+				navigator.throttles += delimiter + controls[i].throttle.ToString();
+				navigator.sailons += delimiter + controls[i].sailon.ToString();
+				navigator.durations += delimiter + controls[i].duration.ToString();
 			}
 			preview.Calculate();
 		}
