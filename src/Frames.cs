@@ -140,16 +140,14 @@ namespace SolarSailNavigator {
 		{
 			// Position
 			var r = orbit.getRelativePositionAtUT(UT).normalized.xzy;
-
 			// CCW
-			var ccw = new Vector3d(-r.y, r.x, r.z);
-
+			var ccw = new Vector3d(-r.z, r.y, r.x);
 			// Unit orbit angular momentum
 			var h = Vector3d.Cross(r, ccw).normalized;
 			// Tangential
 			var t = Vector3d.Cross(h, r).normalized;
 			// QRTN
-			return Quaternion.LookRotation(t, r);
+			return Quaternion.LookRotation(r, t);
 		}
 
 		public static Quaternion CCWFLocal(float[] angles)
