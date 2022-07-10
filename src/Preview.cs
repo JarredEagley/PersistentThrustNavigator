@@ -353,7 +353,7 @@ namespace SolarSailNavigator {
 				objf.layer = 10; // Map
 				//linef.material = MapView.fetch.orbitLinesMaterial;
 				linef.material = MapView.fetch.dottedLineMaterial;
-				linef.material.mainTextureScale = new Vector2(100, 1);
+				linef.material.mainTextureScale = new Vector2(150, 1);
 				linef.SetColors(navigator.controls.colorFinal, navigator.controls.colorFinal);
 				linef.SetVertexCount(361);
 				// 3D points to use in linef
