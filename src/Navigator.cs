@@ -76,6 +76,11 @@ namespace SolarSailNavigator {
 		// When to draw Controls GUI
 		private void OnGUI() {
 			if (IsControlled & anyPersistent) {
+				if (controls == null)
+				{
+					Debug.LogWarning("[SolarSailNavigator] Navigator.OnGUI(): Failed to find controls.");
+					return;
+				}
 				controls.DrawControls();
 				controls.defaultWindow.DrawWindow();
 				foreach (var control in controls.controls) {
@@ -85,6 +90,42 @@ namespace SolarSailNavigator {
 		}
 	
 		// Initialization
+		private void Initialize()
+        {
+			// Find persistent engines
+			foreach (Part p in vessel.parts)
+			{
+				foreach (PartModule pm in p.Modules)
+				{
+					if (pm is PersistentEngine)
+					{
+						var pm2 = (PersistentEngine)pm;
+						persistentEngines.Add(pm as PersistentEngine);
+						//if (pm2.isPersistentEngine) {
+						//	persistentEngines.Add((PersistentEngine)pm);
+						//}
+					}
+				}
+			}
+
+			if (persistentEngines.Count > 0)
+			{
+				Debug.Log("Persistant engines found!");
+				// Persistent propulsion found
+				anyPersistent = true;
+
+				// Sail controls
+				controls = new Controls(this);
+			}
+			else
+			{
+				Debug.Log("Persistant engines NOT*** found!");
+				anyPersistent = false;
+				Events["ShowControls"].active = false;
+				Events["HideControls"].active = false;
+			}
+		}
+
 		public override void OnStart(StartState state) {
 
 			// Check: are we starting?
@@ -93,34 +134,9 @@ namespace SolarSailNavigator {
 			// Base initialization
 			base.OnStart(state);
 	    
-			if (state != StartState.None && state != StartState.Editor) {
-
-				// Find persistent engines
-				foreach (Part p in vessel.parts) {
-					foreach (PartModule pm in p.Modules) {
-						if (pm is PersistentEngine) {
-							var pm2 = (PersistentEngine)pm;
-							persistentEngines.Add(pm as PersistentEngine);
-							//if (pm2.isPersistentEngine) {
-							//	persistentEngines.Add((PersistentEngine)pm);
-							//}
-						}
-					}
-				}
-				
-				if (persistentEngines.Count > 0) {
-					Debug.Log("Persistant engines found!");
-					// Persistent propulsion found
-					anyPersistent = true;
-		    
-					// Sail controls
-					controls = new Controls(this);
-				} else {
-					Debug.Log("Persistant engines NOT*** found!");
-					anyPersistent = false;
-					Events["ShowControls"].active = false;
-					Events["HideControls"].active = false;
-				}
+			if (state != StartState.None && state != StartState.Editor) 
+			{
+				Initialize();
 			}
 		}
 
@@ -142,7 +158,14 @@ namespace SolarSailNavigator {
 			if (anyPersistent) {
 				// Universal time
 				double UT = Planetarium.GetUniversalTime();
-		
+
+				if (controls == null)
+				{
+					Debug.LogWarning("[SolarSailNavigator] Navigator.FixedUpdate(): Failed to find controls.");
+					Initialize();
+					return;
+				}
+
 				// Force attitude to specified frame & hold throttle
 				if (FlightGlobals.fetch != null && IsLocked) {
 					// Set attitude
