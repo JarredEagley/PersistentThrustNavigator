@@ -61,7 +61,22 @@ namespace SolarSailNavigator {
 					  new float[] {0f, 0f, 0f},
 					  ICNFrame,
 					  FAFLocal,
-					  FAFFrame)}
+					  FAFFrame)},
+			{"World", new Frame("Worldspace",
+					  new string[] {"Az", "Ele", "Flatspin"},
+					  "Azimuth/Elevation/Normal",
+					  new float[] {0f, 90f, 0f},
+					  WFFrame,
+					  WFLocal,
+					  WFFrame)},
+			{"CCWF", new Frame("Counter-Clockwise first",
+					  new string[] {"Az", "Ele", "Flatspin"},
+					  "Azimuth/Elevation/Normal",
+					  new float[] {90.0f, 0.0f, 0f},
+					  CCWFFrame,
+					  CCWFLocal,
+					  CCWFFrame)}
+
 			};
 
 		// Quaternion functions used by reference frames
@@ -118,6 +133,59 @@ namespace SolarSailNavigator {
 			return QRTN * QSL;
 		}
 
+		// CCWF Frame
+
+		// Calculate RTN frame quaternion given an orbit and UT
+		public static Quaternion CCWFFrame(Orbit orbit, double UT)
+		{
+			// Position
+			var r = orbit.getRelativePositionAtUT(UT).normalized.xzy;
+
+			// CCW
+			var ccw = new Vector3d(-r.y, r.x, r.z);
+
+			// Unit orbit angular momentum
+			var h = Vector3d.Cross(r, ccw).normalized;
+			// Tangential
+			var t = Vector3d.Cross(h, r).normalized;
+			// QRTN
+			return Quaternion.LookRotation(t, r);
+		}
+
+		public static Quaternion CCWFLocal(float[] angles)
+		{
+			// Angles
+			var cone = angles[0];
+			var clock = angles[1];
+			var flatspin = angles[2];
+			// Unit vectors (in Unity coordinate system)
+			var r = new Vector3d(0, -1, 0); // radial
+											//var t = new Vector3d(0, 0, 1); // tangential
+			var n = new Vector3d(1, 0, 0); // orbit normal
+
+			// Clock angle rotation
+			var Qclock = Quaternion.AngleAxis(clock, r);
+			var rclock = Qclock * r;
+			//var tclock = Qclock * t;
+			var nclock = Qclock * n;
+
+			// Cone angle rotation
+			var Qcone = Quaternion.AngleAxis(cone, nclock);
+			var rcone = Qcone * rclock;
+
+			// Flatspin rotation
+			var Qfs = Quaternion.AngleAxis(flatspin, rcone);
+
+			// Total quaternion
+			return Qfs * Qcone * Qclock;
+		}
+
+		// Sail frame given an orbit, angles, and UT
+		public static Quaternion CCWFFrame(Orbit orbit, double UT, float[] angles)
+		{
+			return CCWFFrame(orbit, UT) * CCWFLocal(angles);
+		}
+
 		// In-track/Cross-track/normal frame
 
 		// Calculate ICN frame from orbit and universal time
@@ -128,11 +196,24 @@ namespace SolarSailNavigator {
 			var v = orbit.getOrbitalVelocityAtUT(UT).normalized.xzy;
 			// Unit orbit angular momentum
 			var h = Vector3d.Cross(r, v).normalized;
+			
 			// Cross track unit vector
 			var c = Vector3d.Cross(h, v).normalized;
 			// QICN
 			return Quaternion.LookRotation(c,v);
 		}
+		public static Quaternion ICNFrameTEST(Orbit orbit, double UT)
+		{
+			// Unit velocity
+			var v = orbit.getOrbitalVelocityAtUT(UT).normalized.xzy;
+			// Orbital normal direction ("upwards")
+			var n = orbit.Up(UT);
+			// Final coordinate vector, cross-track, is a cross product between those two.
+			var c = Vector3d.Cross(v, n).normalized;
+			// QICN
+			return Quaternion.LookRotation(c, v);
+		}
+
 
 		// Local frame given angles
 		public static Quaternion FAFLocal (float[] angles) {
@@ -169,7 +250,50 @@ namespace SolarSailNavigator {
 		public static Quaternion FAFFrame (Orbit orbit, double UT, float[] angles) {
 			return ICNFrame(orbit, UT) * FAFLocal(angles);
 		}
-    }
+
+		// Global frame
+
+		// Calculate Worldspace frame from orbit and universal time
+		public static Quaternion WFFrame(Orbit orbit, double UT)
+		{
+			return Quaternion.identity;
+		}
+
+		// Local frame given angles
+		public static Quaternion WFLocal(float[] angles)
+		{
+			// Angles
+			var azimuth = angles[0];
+			var elevation = angles[1];
+			var flatspin = angles[2];
+
+			// Unit vectors (in Unity coordinate system)
+			var v = new Vector3d(0, 1, 0); 
+			var h = new Vector3d(1, 0, 0); 
+
+			// Azimuth rotation about velocity
+			var Qaz = Quaternion.AngleAxis(azimuth, v);
+			var vAz = Qaz * v;
+			//var cAz = Qaz * c;
+			var hAz = Qaz * h;
+
+			// Flight path angle rotation
+			var Qfpa = Quaternion.AngleAxis(elevation, hAz);
+			var vFPA = Qfpa * vAz;
+
+			// Flatspin rotation
+			var Qfs = Quaternion.AngleAxis(flatspin, vFPA);
+
+			// Total quaternion
+			return Qfs * Qfpa * Qaz;
+		}
+
+		// Total quaternion
+		public static Quaternion WFFrame(Orbit orbit, double UT, float[] angles)
+		{
+			return WFFrame(orbit, UT) * WFLocal(angles);
+		}
+	}
 
     public class FrameWindow {
 		// Rectangle object
