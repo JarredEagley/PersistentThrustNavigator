@@ -187,29 +187,14 @@ namespace SolarSailNavigator {
 		// In-track/Cross-track/normal frame
 
 		// Calculate ICN frame from orbit and universal time
-		public static Quaternion ICNFrameOLD(Orbit orbit, double UT) {
-			// Unit position
-			var r = orbit.getRelativePositionAtUT(UT).normalized.xzy;
-			// Unit velocity
-			var v = orbit.getOrbitalVelocityAtUT(UT).normalized.xzy;
-			// Unit orbit angular momentum
-			var h = Vector3d.Cross(r, v).normalized;
-			
-			// Cross track unit vector
-			var c = Vector3d.Cross(h, v).normalized;
-			// QICN
-			return Quaternion.LookRotation(c,v);
-		}
 		public static Quaternion ICNFrame(Orbit orbit, double UT)
 		{
 			// Unit velocity
 			var v = orbit.getOrbitalVelocityAtUT(UT).normalized.xzy;
 			// Tangent direction
-			var n = new Vector3d(-v.z, v.y, v.x);
-			// Final coordinate vector, cross-track, is a cross product between those two.
-			var c = Vector3d.Cross(v, n).normalized;
+			var n = new Vector3d(v.z, v.y, -v.x);
 			// QICN
-			return Quaternion.LookRotation(c, v);
+			return Quaternion.LookRotation(n, v);
 		}
 
 
