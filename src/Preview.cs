@@ -198,19 +198,20 @@ namespace SolarSailNavigator {
 		// Update segment during renders
 
 		public void Update (Vessel vessel) {
-			if (line != null) {
-				// Enable only on map
-				if (MapView.MapIsEnabled) {
-					line.enabled = true;
-					// Update points
-					Vector3d rRefUT0 = vessel.orbit.referenceBody.getPositionAtUT(UT0);
-					for (int i = 0; i < orbits.Count; i++) {
-						line.SetPosition(i, ScaledSpace.LocalToScaledSpace(rRefUT0 + relativePoints[i]));
-					}
-					line.SetWidth(0.01f * MapView.MapCamera.Distance, 0.01f * MapView.MapCamera.Distance);
-				} else {
-					line.enabled = false;
+			// Nullcheck guard clause.
+			if (line == null) return;
+
+			// Enable only on map
+			if (MapView.MapIsEnabled) {
+				line.enabled = true;
+				// Update points
+				Vector3d rRefUT0 = vessel.orbit.referenceBody.getPositionAtUT(UT0);
+				for (int i = 0; i < orbits.Count; i++) {
+					line.SetPosition(i, ScaledSpace.LocalToScaledSpace(rRefUT0 + relativePoints[i]));
 				}
+				line.SetWidth(0.01f * MapView.MapCamera.Distance, 0.01f * MapView.MapCamera.Distance);
+			} else {
+				line.enabled = false;
 			}
 		}
 	}
