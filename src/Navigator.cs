@@ -148,8 +148,8 @@ namespace SolarSailNavigator {
 	    
 			// Sail deployment GUI
 			if (anyPersistent) {
-			Events["ShowControls"].active = !IsControlled;
-			Events["HideControls"].active = IsControlled;
+				Events["ShowControls"].active = !IsControlled;
+				Events["HideControls"].active = IsControlled;
 			}
 		}
 
