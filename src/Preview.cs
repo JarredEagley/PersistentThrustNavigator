@@ -389,38 +389,40 @@ namespace SolarSailNavigator {
 
 		// Update
 		public void Update (Vessel vessel) {
-			if (navigator.controls.showPreview) {
-				if (segments != null) {
-					foreach(var segment in segments) {
-						segment.Update(vessel);
-					}
+			// Return immediately if previews are disabled.
+			if (!navigator.controls.showPreview) return;
+
+			// Update segments if they exist.
+			if (segments != null) {
+				foreach(var segment in segments) {
+					segment.Update(vessel);
 				}
+			}
 
-				// Update final orbit line from points
-				if (linef != null) {
-					if (MapView.MapIsEnabled) {
-						linef.enabled = navigator.controls.showFinal;
-						// Position of reference body at end of trajectory
-						Vector3d rRefUTf = vessel.orbit.referenceBody.getPositionAtUT(UTf);
-						for (var i = 0; i <= 360; i++) {
-							linef.SetPosition(i, ScaledSpace.LocalToScaledSpace(rRefUTf + linefPoints[i]));
-						}
-						linef.SetWidth(0.01f * MapView.MapCamera.Distance, 0.01f * MapView.MapCamera.Distance);
-
-						// Update target line
-						if (lineT != null) { // If target line exists
-							if (FlightGlobals.fetch.VesselTarget != null) {
-								lineT.enabled = true;
-								lineT.SetPosition(0, ScaledSpace.LocalToScaledSpace(rRefUTf + rFinalRel));
-								lineT.SetPosition(1, ScaledSpace.LocalToScaledSpace(rRefUTf + rTargetFinalRel));
-								lineT.SetWidth(0.01f * MapView.MapCamera.Distance, 0.01f * MapView.MapCamera.Distance);
-							} else {
-								lineT.enabled = false;
-							}
-						}
-					} else {
-						linef.enabled = false;
+			// Update final orbit line from points
+			if (linef != null) {
+				if (MapView.MapIsEnabled) {
+					linef.enabled = navigator.controls.showFinal;
+					// Position of reference body at end of trajectory
+					Vector3d rRefUTf = vessel.orbit.referenceBody.getPositionAtUT(UTf);
+					for (var i = 0; i <= 360; i++) {
+						linef.SetPosition(i, ScaledSpace.LocalToScaledSpace(rRefUTf + linefPoints[i]));
 					}
+					linef.SetWidth(0.01f * MapView.MapCamera.Distance, 0.01f * MapView.MapCamera.Distance);
+
+					// Update target line
+					if (lineT != null) { // If target line exists
+						if (FlightGlobals.fetch.VesselTarget != null) {
+							lineT.enabled = true;
+							lineT.SetPosition(0, ScaledSpace.LocalToScaledSpace(rRefUTf + rFinalRel));
+							lineT.SetPosition(1, ScaledSpace.LocalToScaledSpace(rRefUTf + rTargetFinalRel));
+							lineT.SetWidth(0.01f * MapView.MapCamera.Distance, 0.01f * MapView.MapCamera.Distance);
+						} else {
+							lineT.enabled = false;
+						}
+					}
+				} else {
+					linef.enabled = false;
 				}
 			}
 		}
