@@ -155,44 +155,44 @@ namespace SolarSailNavigator {
 
 		// Physics update
 		public void FixedUpdate() {
-			if (anyPersistent) {
-				// Universal time
-				double UT = Planetarium.GetUniversalTime();
+			// Guard clause; no need to update if we have no persistent engines.
+			if (!anyPersistent) return;
+			
+			// Check to ensure a controls object exists.
+			if (controls == null)
+			{
+				Debug.LogWarning("[SolarSailNavigator] Navigator.FixedUpdate(): Failed to find controls.");
+				Initialize();
+				return;
+			}
 
-				if (controls == null)
-				{
-					Debug.LogWarning("[SolarSailNavigator] Navigator.FixedUpdate(): Failed to find controls.");
-					Initialize();
-					return;
-				}
+			// Grab the Universal time
+			double UT = Planetarium.GetUniversalTime();
 
-				// Force attitude to specified frame & hold throttle
-				if (FlightGlobals.fetch != null && IsLocked) {
-					// Set attitude
-					Control control = controls.Lookup(UT);
-					vessel.SetRotation(control.frame.qfn(vessel.orbit, UT, control.angles));
-					// Set throttle
-					if (isEnabled) {
-						// Realtime mode
-						if (!vessel.packed) {
-							vessel.ctrlState.mainThrottle = control.throttle;
-						}
-						// Warp mode
-						else {
-							foreach (var pe in persistentEngines) {
-								pe.persistentThrottle = control.throttle;
-								pe.persistentThrust = control.throttle * pe.currentEngine.engine.maxThrust;
-								pe.persistentIsp = pe.currentEngine.engine.atmosphereCurve.Evaluate(0);
-							}
+			// Force attitude to specified frame & hold throttle
+			if (FlightGlobals.fetch != null && IsLocked) {
+				// Set attitude
+				Control control = controls.Lookup(UT);
+				vessel.SetRotation(control.frame.qfn(vessel.orbit, UT, control.angles));
+				// Set throttle
+				if (isEnabled) {
+					// Realtime mode
+					if (!vessel.packed) {
+						vessel.ctrlState.mainThrottle = control.throttle;
+					}
+					// Warp mode
+					else {
+						foreach (var pe in persistentEngines) {
+							pe.persistentThrottle = control.throttle;
+							pe.persistentThrust = control.throttle * pe.currentEngine.engine.maxThrust;
+							pe.persistentIsp = pe.currentEngine.engine.atmosphereCurve.Evaluate(0);
 						}
 					}
 				}
 			}
 
 			// Update preview trajectory if it exists
-			if (anyPersistent) {
-				controls.preview.Update(vessel);
-			}
+			controls.preview.Update(vessel);
 		}
     }
 }
